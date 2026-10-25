@@ -1,11 +1,17 @@
 package moth.trickroom.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import moth.trickroom.TrickRoomMod;
 import moth.trickroom.entity.TrickRoomCollision;
+import net.fabricmc.loader.impl.util.log.Log;
+import net.fabricmc.loader.impl.util.log.LogCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +22,6 @@ import java.util.List;
 
 @Mixin(Entity.class)
 public abstract class TrickRoomEntityCollisionMixin {
-    private static final ThreadLocal<Boolean> trickroom$collisionPass = ThreadLocal.withInitial(() -> false);
 
     @Inject(
             method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
@@ -28,31 +33,18 @@ public abstract class TrickRoomEntityCollisionMixin {
         cir.setReturnValue(TrickRoomCollision.clampExitMovement(entity, cir.getReturnValue()));
     }
 
-    @Inject(
-            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
-            at = @At("RETURN"),
-            cancellable = true
+    @WrapMethod(
+            method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;"
     )
-    private static void trickroom$addCollisions(Entity entity, Vec3d movement, Box entityBoundingBox,
-                                                World world, List<VoxelShape> collisions,
-                                                CallbackInfoReturnable<Vec3d> cir) {
-        if (trickroom$collisionPass.get()) {
-            return;
-        }
+    private static Vec3d trickroom$addCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, Operation<Vec3d> original) {
+        if (TrickRoomMod.trickRoomEntities.isEmpty()) return original.call(entity,movement,entityBoundingBox,world,collisions);
 
         List<VoxelShape> roomShapes = TrickRoomCollision.collisionShapes(entity, entityBoundingBox, world, movement);
-        if (roomShapes.isEmpty()) {
-            return;
-        }
+        if (roomShapes.isEmpty()) return original.call(entity,movement,entityBoundingBox,world,collisions);
 
         List<VoxelShape> combinedCollisions = new ArrayList<>(collisions.size() + roomShapes.size());
         combinedCollisions.addAll(collisions);
         combinedCollisions.addAll(roomShapes);
-        trickroom$collisionPass.set(true);
-        try {
-            cir.setReturnValue(Entity.adjustMovementForCollisions(entity, movement, entityBoundingBox, world, combinedCollisions));
-        } finally {
-            trickroom$collisionPass.set(false);
-        }
+        return original.call(entity,movement,entityBoundingBox,world,combinedCollisions);
     }
 }

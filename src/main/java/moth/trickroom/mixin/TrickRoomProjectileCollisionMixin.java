@@ -1,5 +1,6 @@
 package moth.trickroom.mixin;
 
+import moth.trickroom.TrickRoomMod;
 import moth.trickroom.entity.TrickRoomCollision;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
@@ -21,6 +22,7 @@ public abstract class TrickRoomProjectileCollisionMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void trickroom$stopProjectileAtBarrier(CallbackInfo ci) {
+        if (TrickRoomMod.trickRoomEntities.isEmpty()) return;
         ProjectileEntity projectile = (ProjectileEntity) (Object) this;
         if (projectile.getEntityWorld().isClient() || projectile.isRemoved()) {
             return;

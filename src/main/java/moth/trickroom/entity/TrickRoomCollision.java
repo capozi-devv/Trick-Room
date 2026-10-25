@@ -1,6 +1,10 @@
 package moth.trickroom.entity;
 
+import moth.trickroom.TrickRoomMod;
+import net.fabricmc.loader.impl.util.log.Log;
+import net.fabricmc.loader.impl.util.log.LogCategory;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -107,11 +111,15 @@ public final class TrickRoomCollision {
     }
 
     private static List<TrickRoomEntity> roomsIntersecting(World world, Box box) {
-        return world.getEntitiesByType(
-                ModEntityTypes.TRICK_ROOM,
-                box.expand(ROOM_QUERY_PADDING),
-                room -> room.hasRoomBounds() && !room.isFadingOut() && room.getRoomBounds().intersects(box)
-        );
+        ArrayList<TrickRoomEntity> collidingEntities = new ArrayList<>();
+        TrickRoomMod.trickRoomEntities.removeIf(Entity::isRemoved);
+        for (TrickRoomEntity room : TrickRoomMod.trickRoomEntities) {
+            if (!room.hasRoomBounds() || room.isFadingOut()) break;
+            if (room.getRoomBounds().intersects(box)) {
+                collidingEntities.add(room);
+            }
+        }
+        return collidingEntities;
     }
 
     private static Box boxBetween(Vec3d start, Vec3d end) {

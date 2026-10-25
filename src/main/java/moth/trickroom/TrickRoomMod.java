@@ -3,12 +3,14 @@ package moth.trickroom;
 import moth.trickroom.effect.ModStatusEffects;
 import moth.trickroom.entity.ModEntityTypes;
 import moth.trickroom.entity.TrickRoomCollision;
+import moth.trickroom.entity.TrickRoomEntity;
 import moth.trickroom.item.DataComponentTypeInit;
 import moth.trickroom.item.ModItems;
 import moth.trickroom.network.TrickRoomFlashPacket;
 import moth.trickroom.network.TrickRoomModePacket;
 import moth.trickroom.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -23,9 +25,12 @@ import org.apostasy.apostle.api.event.MagicCallbacks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 public final class TrickRoomMod implements ModInitializer {
     public static final String MOD_ID = "trickroom";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static ArrayList<TrickRoomEntity> trickRoomEntities = new ArrayList<>();
 
     @Override
     public void onInitialize() {
@@ -49,6 +54,10 @@ public final class TrickRoomMod implements ModInitializer {
         } catch (Error e) {
             e.printStackTrace();
         }
+
+        ServerLifecycleEvents.SERVER_STARTED.register((s)->{
+            trickRoomEntities.clear(); // resets the entity cache for singleplayer
+        });
     }
 
     public static Identifier id(String path) {

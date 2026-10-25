@@ -1,5 +1,6 @@
 package moth.trickroom.mixin;
 
+import moth.trickroom.TrickRoomMod;
 import moth.trickroom.entity.TrickRoomCollision;
 import moth.trickroom.effect.ModStatusEffects;
 import moth.trickroom.item.TrickRoomItem;
@@ -74,6 +75,7 @@ public abstract class TrickRoomStatusEffectMixin {
             ordinal = 0
     )
     private StatusEffectInstance trickroom$reverseStatusEffectInsideRoom(StatusEffectInstance effect) {
+        if (TrickRoomMod.trickRoomEntities.isEmpty()) return effect;
         LivingEntity entity = (LivingEntity) (Object) this;
         if (!ModStatusEffects.isRoomReversalDisabled() && TrickRoomCollision.entityInsideAnyRoom(entity)) {
             return ModStatusEffects.reverse(effect);

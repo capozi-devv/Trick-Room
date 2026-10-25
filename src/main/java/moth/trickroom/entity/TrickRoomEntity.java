@@ -1,18 +1,22 @@
 package moth.trickroom.entity;
 
+import moth.trickroom.TrickRoomMod;
 import moth.trickroom.effect.ModStatusEffects;
 import moth.trickroom.network.TrickRoomFlashPacket;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -72,6 +76,7 @@ public class TrickRoomEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (!TrickRoomMod.trickRoomEntities.contains(this)) TrickRoomMod.trickRoomEntities.add(this);
         this.setVelocity(Vec3d.ZERO);
         tickFadeOut();
         if (hasRoomBounds()) {
@@ -80,6 +85,22 @@ public class TrickRoomEntity extends Entity {
         if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
             reverseEffectsForNewEntrants(serverWorld);
         }
+    }
+
+    @Override
+    protected boolean updateWaterState() {
+        return false; // this check HELLA lags the game, likely since the AB is so big and round oughhh
+    }
+
+    @Override
+    public boolean updateMovementInFluid(TagKey<Fluid> tag, double speed) {
+        return false; // ditto
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        TrickRoomMod.trickRoomEntities.remove(this);
+        super.remove(reason);
     }
 
     public void setRoomBounds(Box bounds) {
