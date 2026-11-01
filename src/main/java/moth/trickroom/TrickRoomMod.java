@@ -18,7 +18,10 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
@@ -49,6 +52,9 @@ public final class TrickRoomMod implements ModInitializer {
         try {
             MagicCallbacks.CAN_CAST_SPELL.register( (user, world, spell) -> {
                 if (TrickRoomCollision.entityInsideAnyRoom(user)) {
+                    if (user instanceof PlayerEntity player) {
+                        player.sendMessage(Text.of("Your staff's magic is weakened...").copy().formatted(Formatting.ITALIC, Formatting.GRAY), true);
+                    }
                     return false;
                 }
                 return true;
