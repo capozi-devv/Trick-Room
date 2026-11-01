@@ -76,7 +76,7 @@ public class TrickRoomEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (!TrickRoomMod.trickRoomEntities.contains(this)) TrickRoomMod.trickRoomEntities.add(this);
+        if (TrickRoomMod.trickRoomEntities.get(this) != null) TrickRoomMod.trickRoomEntities.put(this, this.getEntityWorld());
         this.setVelocity(Vec3d.ZERO);
         tickFadeOut();
         if (hasRoomBounds()) {

@@ -112,13 +112,16 @@ public final class TrickRoomCollision {
 
     private static List<TrickRoomEntity> roomsIntersecting(World world, Box box) {
         ArrayList<TrickRoomEntity> collidingEntities = new ArrayList<>();
-        TrickRoomMod.trickRoomEntities.removeIf(Entity::isRemoved);
-        for (TrickRoomEntity room : TrickRoomMod.trickRoomEntities) {
-            if (!room.hasRoomBounds() || room.isFadingOut()) break;
-            if (room.getRoomBounds().intersects(box)) {
-                collidingEntities.add(room);
+        TrickRoomMod.trickRoomEntities.forEach((room, entityWorld) -> {
+            if (room.isRemoved()) {
+                TrickRoomMod.trickRoomEntities.remove(room);
             }
-        }
+            if (room.hasRoomBounds() && !room.isFadingOut()) {
+                if (room.getRoomBounds().intersects(box) && entityWorld == world) {
+                    collidingEntities.add(room);
+                }
+            }
+        });
         return collidingEntities;
     }
 

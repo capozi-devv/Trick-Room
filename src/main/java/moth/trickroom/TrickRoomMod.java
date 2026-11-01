@@ -1,5 +1,7 @@
 package moth.trickroom;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import moth.trickroom.effect.ModStatusEffects;
 import moth.trickroom.entity.ModEntityTypes;
 import moth.trickroom.entity.TrickRoomCollision;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
 public final class TrickRoomMod implements ModInitializer {
     public static final String MOD_ID = "trickroom";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static ArrayList<TrickRoomEntity> trickRoomEntities = new ArrayList<>();
+    public static BiMap<TrickRoomEntity, World> trickRoomEntities = HashBiMap.create();
 
     @Override
     public void onInitialize() {
@@ -54,7 +56,6 @@ public final class TrickRoomMod implements ModInitializer {
         } catch (Error e) {
             e.printStackTrace();
         }
-
         ServerLifecycleEvents.SERVER_STARTED.register((s)->{
             trickRoomEntities.clear(); // resets the entity cache for singleplayer
         });
