@@ -45,6 +45,6 @@ public abstract class TrickRoomEntityCollisionMixin {
         List<VoxelShape> combinedCollisions = new ArrayList<>(collisions.size() + roomShapes.size());
         combinedCollisions.addAll(collisions);
         combinedCollisions.addAll(roomShapes);
-        return original.call(entity,movement,entityBoundingBox,world,combinedCollisions);
+        return original.call(entity, movement, entityBoundingBox, world, combinedCollisions);
     }
 }

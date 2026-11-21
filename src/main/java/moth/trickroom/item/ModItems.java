@@ -11,6 +11,7 @@ import net.minecraft.registry.RegistryKeys;
 
 public final class ModItems {
     public static final Item TRICK_ROOM = register("trick_room", new TrickRoomItem(settings("trick_room").maxCount(1).fireproof()));
+    public static final Item CRACKED_TRICK_ROOM = register("cracked_trick_room", new TrickRoomItem(settings("cracked_trick_room").maxCount(1).fireproof()));
 
     private ModItems() {
     }
